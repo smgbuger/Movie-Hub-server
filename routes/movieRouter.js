@@ -1,10 +1,12 @@
 const express = require("express");
+
+const methodNotAllowed = require("../utils/methodNotAllowed");
+
 const {
   allShows,
   allSeries,
   allMovie,
 } = require("../controllers/movieController");
-const methodNotAllowed = require("../utils/methodNotAllowed");
 
 const router = express.Router();
 

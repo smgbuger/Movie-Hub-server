@@ -1,22 +1,25 @@
 const jwt = require("jsonwebtoken");
 const customError = require("../utils/customError");
 
+const extractToken = (authHeader) => {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    throw customError("No Token Provided", 401);
+  }
+
+  return authHeader.split(" ")[1];
+};
+
 const auth = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return next(customError("No Token Provided", 401));
-  }
-  const token = authHeader.split(" ")[1];
-
   try {
+    const token = extractToken(req.headers.authorization);
+
     const payLoad = jwt.verify(token, process.env.JWT_SECRETE);
-    console.log(payLoad);
+
     req.user = { userId: payLoad.userId };
-    console.log(req.user);
-    next();
   } catch (error) {
-    return next(customError("Unathorised", 401));
+    return next(customError("Unauthorized", 401));
   }
 };
 

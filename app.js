@@ -9,13 +9,21 @@ const cors = require("cors");
 const authRouter = require("./routes/authRouter"); // middleware for auth page
 const movieRouter = require("./routes/movieRouter"); // midleware for movie router
 const bookmarkRouter = require("./routes/bookmarkRouter"); // midleware for bookmark router
-const error = require("./middlewares/error"); //imported middleware
+
+const errorMiddleware = require("./middlewares/error"); //imported middleware
 
 const app = express();
 
-const port = 4000;
+const port = process.env.PORT || 4000;
 
-app.use(cors());
+const corsOption = {
+  origin: "*",
+  methods: "GET, HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionSuccessStatus: 204,
+};
+
+app.use(cors(corsOption));
 
 //a middleware that allow access to the req.body on all request(Without this you cant test on postman)
 app.use(express.json());
@@ -28,7 +36,8 @@ app.use("/api/movie", movieRouter);
 app.use("/api/bookmark", bookmarkRouter);
 
 // custom middleware for erros
-app.use(error); //import the error for middleware into the app.js
+app.use(errorMiddleware);
+//import the error for middleware into the app.js
 
 //start listening on a given port and run the callback function when invoked
 const start = async () => {
@@ -41,7 +50,8 @@ const start = async () => {
     });
   } catch (error) {
     console.log(error);
-    console.log("Unable to connect");
+    console.log("Unable to connect to the Database:", err.message);
+    process.exit(1);
   }
 };
 start();
